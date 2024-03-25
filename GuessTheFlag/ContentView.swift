@@ -16,6 +16,8 @@ struct ContentView: View {
     @State private var score = 0
     @State private var questionCount = 0
     @State private var finished = false
+    @State private var spin = [0.0, 0.0, 0.0]
+    @State private var animate = [1.0, 1.0, 1.0]
     
     var body: some View {
         ZStack {
@@ -44,6 +46,9 @@ struct ContentView: View {
                         } label: {
                             FlagImage(countries[number])
                         }
+                        .rotation3DEffect(.degrees(spin[number]), axis: /*@START_MENU_TOKEN@*/(x: 0.0, y: 1.0, z: 0.0)/*@END_MENU_TOKEN@*/)
+                        .opacity(animate[number])
+                        .scaleEffect(animate[number])
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -70,6 +75,14 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        withAnimation() {
+            spin[number] += 360
+            for val in 0..<animate.count {
+                if val != number {
+                    animate[val] = 0.25
+                }
+            }
+        }
         questionCount += 1
         if number == correctAnswer {
             scoreTitle = "Correct"
@@ -88,6 +101,8 @@ struct ContentView: View {
     }
     
     func askQuestion() {
+        spin = [0.0, 0.0, 0.0]
+        animate = [1.0, 1.0, 1.0]
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
